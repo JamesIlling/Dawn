@@ -10,4 +10,9 @@
     border-width: 1px;
     background-color: #FFFFFF;
     padding: 10px;
-} 
+}
+.ui-jqgrid .ui-jqgrid-bdiv { overflow-y: scroll }
+
+.jqx-listbox .jqx-item {
+    font-size: 13px;
+}

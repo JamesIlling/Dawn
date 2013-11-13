@@ -213,7 +213,6 @@ function loadDataGrid(path) {
         pagesize:15,
         sortable: true,
         altrows: true,
-        autoheight: true,
         columnsresize: true,
         scrollmode: 'logical',
         columns: [

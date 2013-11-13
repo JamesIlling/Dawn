@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Trench</title>
+    <link rel="stylesheet" href="../Css/reset.css"/>
+    <link rel="stylesheet" href="../Css/jquery-ui.css"/>
+    <link rel="stylesheet" href="../Css/jqWidget/jqx.base.css" type="text/css"/>
+    <link rel="stylesheet" href="../Css/input.css"/>
+    <script src="../javascript/jquery.min.js"></script>
+    <script src="../javascript/jquery-ui.js"></script>
+    <script src="../javascript/serviceLocation.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../javascript/jqWidgets/getTheme.js"></script>
+    <script type="text/javascript" src="../javascript/jqWidgets/jqx-all.js"></script>
+    <script type="text/javascript" src="../javascript/postAddTrench.js"></script>
+    <script type="text/javascript" src="../javascript/geoLocation.js"></script>
+    <script type="text/javascript" src="../javascript/getParameters.js"></script>
+    <script type="text/javascript" src="../javascript/addTrench.js"></script>
+    <link rel="stylesheet" href="../Css/style.css"/>
+    <link rel="stylesheet" href="../Css/geoLocation.css"/>
+</head>
+<body>
+<div class="container">
+    <button id="Main" class="navigationButton"><img src="../icons/Table.png"/><br/>Main screen</button>
+    <button id="AddFind" class="navigationButton"><img src="../icons/Milk-Bottle.png"/><br/>Add Find</button>
+    <button id="AddTrench" class="navigationButton"><img src="../icons/Spade-32.png"/><br/>Add Trench</button>
+    <button id="AddSite" class="navigationButton"><img src="../icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
+    <button id="Settings" class="navigationButton"><img src="../icons/Settings-02.png"/><br/>Settings</button>
+    <button id="Upload" value='Upload' class="navigationButton"><img
+            src="/icons/Upload.png"/><br/>Upload
+    </button>
+</div>
+
+<form name="frmAddTrench" action="../index.html">
+    <div class="container">
+        <div class="title">
+            <h2>Add new Trench</h2>
+        </div>
+        <input type="hidden" id="id"/>
+
+        <div>
+            <label for="sites">
+                Site:</label>
+
+            <div id="sites" style="display: inline-block; vertical-align: middle;">
+            </div>
+        </div>
+        <div>
+            <label for="name">Name:</label>
+            <input id="name" type="text" name="name" value="" class="textbox"/>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <input id="description" type="text" name="description" value="" class="textbox"/>
+        </div>
+        <div>
+            <!-- geolocation.cs adds functionality to the
+                geolocation button to use HTML5 geolocation
+                API to get the current location and write
+                it to the item with the id coordinates -->
+            <label for="coordinates">Coordinates:</label>
+            <input id="coordinates" type="text"/>
+            <input type="button" id="geolocation"/>
+        </div>
+        <div id="Navigation">
+            <input type="submit" id="Save" value="Save" class="internalNavigationButton"/>
+        </div>
+    </div>
+</form>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title id="title">Upload</title>
+
+    <!-- http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js-->
+    <script type="text/javascript" src="../javascript/jquery.min.js"></script>
+    <script src="../javascript/serviceLocation.js" type="text/javascript"></script>
+
+    <script src="../javascript/Upload.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" href="../Css/style.css"/>
+    <link rel="stylesheet" href="../Css/input.css"/>
+
+    <script type="text/javascript">
+        $(function () {
+            ConfigureButtons();
+        });
+
+    </script>
+
+</head>
+<body>
+<div class="container">
+    <button id="Main" class="navigationButton"><img src="../icons/Table.png"/><br/>Main screen</button>
+    <button id="AddFind" class="navigationButton"><img src="../icons/Milk-Bottle.png"/><br/>Add Find</button>
+    <button id="AddTrench" class="navigationButton"><img src="../icons/Spade-32.png"/><br/>Add Trench</button>
+    <button id="AddSite" class="navigationButton"><img src="../icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
+    <button id="Settings" class="navigationButton"><img src="../icons/Settings-02.png"/><br/>Settings</button>
+    <button id="Upload" class="navigationButton"><img src="../icons/Upload.png"/><br/>Upload</button>
+
+</div>
+<div class="container">
+    <form name="frmUpload" method="post" enctype="multipart/form-data" action="../Data/index.php/import">
+        <div>
+            <label for="file">XML to update:</label>
+            <input type="file" name="file" id="file"><br>
+            <input type="submit" id="uploadButton" value="Import" class="internalNavigationButton"/>
+        </div>
+    </form>
+</div>
+</body>
+</html>

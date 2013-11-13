@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title id="title">Find</title>
+    <!-- reset css of each browser to a base common css style. -->
+    <link rel="stylesheet" href="../Css/reset.css"/>
+    <link rel="stylesheet" href="../Css/input.css"/>
+    <!-- JQueryUI required for numeric spinner, and used in most scripts.
+        http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css -->
+    <link rel="stylesheet" href="../Css/jquery-ui.css"/>
+
+    <!-- http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js-->
+    <script type="text/javascript" src="../javascript/jquery.min.js"></script>
+
+    <!-- http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js-->
+    <script type="text/javascript" src="../javascript/jquery-ui.js"></script>
+
+    <!-- Adds GPS support when online. -->
+    <script type="text/javascript" src="../javascript/geoLocation.js"></script>
+    <script src="../javascript/serviceLocation.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../javascript/postAddFind.js"></script>
+    <!-- Adds navigation between "pages"-->
+    <script type="text/javascript" src="../javascript/navigation.js"></script>
+    <script type="text/javascript" src="../javascript/getParameters.js"></script>
+
+    <script type="text/javascript" src="../javascript/jqWidgets/getTheme.js"></script>
+    <script type="text/javascript" src="../javascript/jqWidgets/jqx-all.js"></script>
+    <script type="text/javascript" src="../javascript/addFind.js"></script>
+    <link rel="stylesheet" href="../Css/jqWidget/jqx.base.css" type="text/css"/>
+
+    <!-- Convert numSherds to be a JQueryUI numeric spinner. -->
+    <script type="text/javascript">
+        $(function () {
+            InitialiseForm();
+        });
+
+    </script>
+
+    <link rel="stylesheet" href="../Css/style.css"/>
+    <link rel="stylesheet" href="../Css/addFind.css"/>
+    <link rel="stylesheet" href="../Css/geoLocation.css"/>
+</head>
+<body>
+<div class="container">
+
+    <button id="Main" class="navigationButton"><img src="../icons/Table.png"/><br/>Main screen</button>
+    <button id="AddFind" class="navigationButton"><img src="../icons/Milk-Bottle.png"/><br/>Add Find</button>
+    <button id="AddTrench" class="navigationButton"><img src="../icons/Spade-32.png"/><br/>Add Trench</button>
+    <button id="AddSite" class="navigationButton"><img src="../icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
+    <button id="Settings" class="navigationButton"><img src="../icons/Settings-02.png"/><br/>Settings</button>
+    <button id="Upload" value='Upload' class="navigationButton"><img
+            src="/icons/Upload.png"/><br/>Upload
+    </button>
+</div>
+
+<form name="frmAddFind" action="../index.html">
+    <div class="container">
+    <div id="ui-widget">
+<div id="page1">
+    <div class="title">
+        <h2>Add a new find</h2>
+    </div>
+    <input type="hidden" id="id"/>
+
+    <div>
+        <label for="sites">
+            Site:</label>
+
+        <div id="sites" style="display: inline-block"></div>
+    </div>
+    <div>
+        <label for="trenchId">
+            Trench:</label>
+
+        <div id="trenchId" style="display: inline-block">
+        </div>
+    </div>
+    <div>
+        <label for="findNumber">
+            Find Number:</label>
+        <input id="findNumber" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="context">
+            Context:</label>
+        <input id="context" type="text" class="textbox"/>
+    </div>
+    <div>
+        <!-- the script at the top of this file converts this
+                element to a numeric spinner. Type must be set
+                to text to avoid conflict with JavaScript spinner. -->
+        <label for="numSherds">
+            Number Of sherds:</label>
+        <input id="numSherds" type="text" value="1"/>
+    </div>
+    <div>
+        <!-- geoLocation.js adds functionality to the
+                geolocation button to use HTML5 geolocation
+                API to get the current location and write
+                it to the item with the id coordinates -->
+        <label for="coordinates">
+            Coordinates:</label>
+        <input id="coordinates" type="text"/>
+        <input type="button" id="geolocation"/>
+    </div>
+</div>
+<div id="page2" class="hidden">
+    <div class="title">
+        <h2>Physical Characteristics</h2>
+    </div>
+    <div>
+        <label for="sherdType">
+            Sherd Type:</label>
+        <input id="sherdType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="fabricType">
+            Fabric Type:</label>
+        <input id="fabricType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="fabricTypeCode">
+            FabricType Code:</label>
+        <input id="fabricTypeCode" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="wareType">
+            Ware Type:</label>
+        <input id="wareType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="baseType">
+            Base Type:</label>
+        <input id="baseType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="rimType">
+            Rim Type:</label>
+        <input id="rimType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="fabricColour">
+            Fabric Colour:</label>
+        <input id="fabricColour" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="construction">
+            Construction:</label>
+        <input id="construction" type="text" class="textbox"/>
+    </div>
+</div>
+<div id="page3" class="hidden">
+    <div class="title">
+        <h2>Physical Dimensions</h2>
+    </div>
+    <div>
+        <label for="height">
+            Height:</label>
+        <input id="height" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="width">
+            Width:</label>
+        <input id="width" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="thickness">
+            Thickness:</label>
+        <input id="thickness" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="Weight">
+            Weight:</label>
+        <input id="Weight" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="rimDiameter">
+            Rim Diameter:</label>
+        <input id="rimDiameter" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="baseDiameter">
+            Base Diameter:</label>
+        <input id="baseDiameter" type="text" class="textbox"/>
+    </div>
+</div>
+<div id="page4" class="hidden">
+    <div class="title">
+        <h2>Exterior</h2>
+    </div>
+    <div>
+        <label for="surfaceTreatment">
+            Surface Treatment:</label>
+        <input id="surfaceTreatment" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="temperType">
+            Temper Type:</label>
+        <input id="temperType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="temperQuality">
+            Temper Quality:</label>
+        <input id="temperQuality" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="manufacture">
+            Manufacture:</label>
+        <input id="manufacture" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="sherdCondition">
+            Sherd Condition:</label>
+        <input id="sherdCondition" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="decoration">
+            Decoration:</label>
+        <input id="decoration" type="text" class="textbox"/>
+    </div>
+</div>
+<div id="page5" class="hidden">
+    <div class="title">
+        <h2>Scientific Analysis</h2>
+    </div>
+    <div>
+        <label for="scientificAnalysisType">
+            Scientific Analysis Type:</label>
+        <input id="scientificAnalysisType" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="sampleNumber">
+            Sample Number:</label>
+        <input id="sampleNumber" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="mnvRepresented">
+            Minimum Number of Vessels Represented:</label>
+        <input id="mnvRepresented" type="text" class="textbox"/>
+    </div>
+    <div>
+        <label for="residues">
+            Residues:</label>
+        <input id="residues" type="text" class="textbox"/>
+    </div>
+</div>
+        <div id="page6" class="hidden">
+            <div>
+                <label for="notes">Notes:</label>
+                <textarea id="notes" rows="10" cols="100" class="textbox"></textarea>
+            </div>
+        </div>
+<div id="Navigation">
+    <!-- display the previous page in the wizard for adding a find.-->
+    <input type="button" id="previous" value="Previous" class="internalNavigationButton"/>
+    <!-- Save the find. -->
+    <input type="submit" id="Save" value="Save" class="internalNavigationButton"/>
+    <!-- display then next page in the wizard for adding a find. -->
+    <input type="button" id="next" value="Next" class="internalNavigationButton"/>
+</div>
+
+        </div></div>
+</form>
+</body>
+</html>

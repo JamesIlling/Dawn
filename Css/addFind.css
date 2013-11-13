@@ -1,0 +1,17 @@
+.ui-spinner {
+    margin-top: 5px;
+    margin-bottom: 3px;
+    height: 32px;
+    font-family: Helvetica;
+    font-size: 1em;
+    width: 260px;
+}
+
+.ui-spinner-input {
+    margin-top: 0px;
+}
+
+.hidden {
+    display: none;
+}
+

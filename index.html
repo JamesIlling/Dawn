@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Project Dawn</title>
+    <link rel="stylesheet" type="text/css" href="Css/reset.css">
+    <link rel="stylesheet" type="text/css" href="Css/style.css">
+     <link rel="stylesheet" href="Css/jqWidget/jqx.base.css" type="text/css" />
+    <script src="javascript/jquery.min.js"></script>
+    <script src="javascript/caching.js"></script>
+    <script type="text/javascript" src="javascript/jquery.min.js"></script>    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            $("#Main").click(function() {
+                window.location = "Views/Main.html";
+            });
+          
+            $("#AddFind").click(function() {
+                window.location = "Views/AddFind.html";
+            });
+            $("#AddTrench").click(function() {
+                window.location = "Views/AddTrench.html";
+            });
+            $("#AddSite").click(function () {
+                window.location = "Views/AddSite.html";
+            });
+            $("#Settings").click(function () {
+                window.location = "Views/settings.html";
+            });
+
+            $("#Upload").click(function () {
+                window.location = "Views/Upload.html";
+            });
+
+        });
+    </script>
+</head>
+<body>
+    
+    <div class="container">
+        <div>
+            <button id ="Main" class="navigationButton"><img src="icons/Table.png" /><br/>Main screen</button>
+            <button id="AddFind" class="navigationButton"><img src="icons/Milk-Bottle.png"/><br/>Add Find</button>
+            <button id="AddTrench" class="navigationButton"><img src="icons/Spade-32.png"/><br/>Add Trench</button>
+            <button id="AddSite" class="navigationButton"><img src="icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
+            <button id="Settings" class="navigationButton"><img src="icons/Settings-02.png"/><br/>Settings</button>
+            <button id="Upload" class="navigationButton"><img src="icons/upload.png"/><br/>Settings</button>
+        </div>
+        <h3>Update Messages:</h3>
+        <div id="CacheState">
+        </div>
+        
+    </div>
+</body>
+</html>

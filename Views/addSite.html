@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title id="title">Site</title>
+    <link rel="stylesheet" href="../Css/reset.css"/>
+    <script src="../javascript/jquery.min.js"></script>
+    <script src="../javascript/serviceLocation.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../javascript/geoLocation.js"></script>
+    <script type="text/javascript" src="../javascript/postAddSite.js"></script>
+    <link rel="stylesheet" href="../Css/style.css"/>
+    <link rel="stylesheet" href="../Css/input.css"/>
+    <link rel="stylesheet" href="../Css/jquery-ui.css"/>
+    <link rel="stylesheet" href="../Css/geoLocation.css"/>
+    <script type="text/javascript" src="../javascript/getParameters.js"></script>
+    <script type="text/javascript">
+        // Automatically populate data from the Url values;
+        // Todo add code to perform a look up for a site.
+        $(document).ready(function () {
+            var $getParameters = getUrlVars();
+            if ($getParameters['id'] != null)
+            {
+                var remoteUrl = getServiceLocation()+"sites/" + $getParameters['id'];
+                // Get findData
+                var data = JSON.parse($.ajax({
+                    type: "GET",
+                    url: remoteUrl,
+                    async: false
+                }).responseText);
+                $getParameters = data[0];
+            }
+            if ($getParameters != null) {
+                $('.title').html("<h2>Edit Site</h2>");
+                populateForm($getParameters);
+            }
+        });
+
+        function populateForm($parameters) {
+            if ($parameters != null) {
+                $('#id').val($parameters['id']);
+                $('#name').val($parameters['name']);
+                $('#description').val($parameters['description']);
+                $('#coordinates').val($parameters['coordinates']);
+            }
+        }
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $("#Main").click(function () {
+                window.location = "../Views/Main.html";
+            });
+
+            $("#AddFind").click(function () {
+                window.location = "../Views/AddFind.html";
+            });
+            $("#AddTrench").click(function () {
+                window.location = "../Views/AddTrench.html";
+            });
+            $("#AddSite").click(function () {
+                window.location = "../Views/AddSite.html";
+            });
+
+            $("#Settings").click(function () {
+                window.location = "../Views/settings.html";
+            });
+            $("#Upload").click(function () {
+                window.location = "../Views/Upload.html";
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+
+    <button id="Main" class="navigationButton"><img src="../icons/Table.png"/><br/>Main screen</button>
+    <button id="AddFind" class="navigationButton"><img src="../icons/Milk-Bottle.png"/><br/>Add Find</button>
+    <button id="AddTrench" class="navigationButton"><img src="../icons/Spade-32.png"/><br/>Add Trench</button>
+    <button id="AddSite" class="navigationButton"><img src="../icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
+    <button id="Settings" class="navigationButton"><img src="../icons/Settings-02.png"/><br/>Settings</button>
+    <button id="Upload" value='Upload' class="navigationButton"><img
+            src="/icons/Upload.png"/><br/>Upload
+    </button>
+</div>
+
+<form name="frmAddSite" action="../index.html">
+    <div class="container">
+        <div class="title">
+            <h2>Add new Site</h2>
+        </div>
+        <input type="hidden" id="id"/>
+
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" value="" class="textbox"/>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <input type="text" id="description" value="" class="textbox"/>
+        </div>
+        <div>
+            <!-- geolocation.cs adds functionality to the
+            geolocation button to use HTML5 geolocation
+            API to get the current location and write
+            it to the item with the id coordinates -->
+            <label for="coordinates">Coordinates:</label>
+            <input id="coordinates" type="text"/>
+            <input type="button" id="geolocation"/>
+        </div>
+        <div id="Navigation">
+            <input type="submit" id="Save" value="Save" class="internalNavigationButton"/>
+        </div>
+    </div>
+</form>
+</body>
+</html>

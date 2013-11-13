@@ -1,0 +1,73 @@
+body {
+    background: url('../icons/background.png');
+}
+
+.navigationButton
+{
+    width:125px;
+    height: 100px;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    border-radius: 2px;
+    background: #e0e0e0; /* Old browsers */
+    background: -moz-linear-gradient(top, #e0e0e0 0%, #d0d0d0 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e0e0e0), color-stop(100%, #d0d0d0)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #e0e0e0 0%, #d0d0d0 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #e0e0e0 0%, #d0d0d0 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #e0e0e0 0%, #d0d0d0 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #e0e0e0 0%, #d0d0d0 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e0e0e0', endColorstr='#d0d0d0', GradientType=0); /* IE6-9 */
+}
+
+.title {
+    width: auto;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.internalNavigationButton {
+    width: 140px;
+    margin: 10px auto 3px auto;
+}
+.container {
+    width: 775px;
+    margin-top: 25px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 1px;
+    background-color: #FFFFFF;
+    padding: 10px;
+}
+
+.textbox {
+    width: 260px;
+}
+
+label {
+    display: inline-block;
+    width: 170px;
+    text-align: right;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+
+#sites {
+    width: 260px;
+    height: 30px;
+    vertical-align: middle;
+}
+
+#trenches {
+    width: 260px;
+    height: 30px;
+    vertical-align: middle;
+    margin-top: 2px;
+}
+

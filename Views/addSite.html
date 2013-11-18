@@ -12,63 +12,7 @@
     <link rel="stylesheet" href="../Css/jquery-ui.css"/>
     <link rel="stylesheet" href="../Css/geoLocation.css"/>
     <script type="text/javascript" src="../javascript/getParameters.js"></script>
-    <script type="text/javascript">
-        // Automatically populate data from the Url values;
-        // Todo add code to perform a look up for a site.
-        $(document).ready(function () {
-            var $getParameters = getUrlVars();
-            if ($getParameters['id'] != null)
-            {
-                var remoteUrl = getServiceLocation()+"sites/" + $getParameters['id'];
-                // Get findData
-                var data = JSON.parse($.ajax({
-                    type: "GET",
-                    url: remoteUrl,
-                    async: false
-                }).responseText);
-                $getParameters = data[0];
-            }
-            if ($getParameters != null) {
-                $('.title').html("<h2>Edit Site</h2>");
-                populateForm($getParameters);
-            }
-        });
-
-        function populateForm($parameters) {
-            if ($parameters != null) {
-                $('#id').val($parameters['id']);
-                $('#name').val($parameters['name']);
-                $('#description').val($parameters['description']);
-                $('#coordinates').val($parameters['coordinates']);
-            }
-        }
-    </script>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-
-            $("#Main").click(function () {
-                window.location = "../Views/Main.html";
-            });
-
-            $("#AddFind").click(function () {
-                window.location = "../Views/AddFind.html";
-            });
-            $("#AddTrench").click(function () {
-                window.location = "../Views/AddTrench.html";
-            });
-            $("#AddSite").click(function () {
-                window.location = "../Views/AddSite.html";
-            });
-
-            $("#Settings").click(function () {
-                window.location = "../Views/settings.html";
-            });
-            $("#Upload").click(function () {
-                window.location = "../Views/Upload.html";
-            });
-        });
-    </script>
+    <script type="text/javascript" src="../javascript/addSite.js"></script>
 </head>
 <body>
 <div class="container">

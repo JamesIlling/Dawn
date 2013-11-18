@@ -17,7 +17,7 @@ class Trench
      * Short Create a new trench object
      * @param common Common the common validation to use,
      * @param $site  Site The site handler.
-     * @param $db    mysqli the database connection to use.
+     * @param $db    PDO the database connection to use.
      * @return Trench A new instance of the Trench object.
      */
     public function __construct($common, $site, $db)
@@ -52,10 +52,11 @@ class Trench
      */
     public function Exists($id)
     {
-        $trenchSql = "SELECT * FROM trench WHERE id=" . $id;
-        $trenchQuery = $this->database->query($trenchSql);
+        $error = new ErrorResponse();
+        $trenchSql = "SELECT * FROM trench WHERE id=:id";
+        $trenches = $this->common->ExecuteCommand($trenchSql, array(':id' => $id), $error);
 
-        return $trenchQuery->num_rows > 0;
+        return count($trenches) > 0;
     }
 
     /**
@@ -67,18 +68,11 @@ class Trench
     {
         $trenchNameMap = Array();
         $trenchSql = "SELECT id, name FROM trench";
-        $trenchQuery = $this->database->query($trenchSql);
-        if ($trenchQuery) {
-            while ($trenchRow = $trenchQuery->fetch_array(MYSQL_ASSOC)) {
-                $trenchNameMap[$trenchRow['id']] = $trenchRow['name'];
-            }
-
-            return $trenchNameMap;
-        } else {
-            $error->AddNewError("CRITICAL", $this->database->error);
+        $trenches = $this->common->ExecuteCommand($trenchSql, array(), $error);
+        foreach ($trenches as $trench) {
+            $trenchNameMap[$trench['id']] = $trench['name'];
         }
-
-        return Array();
+        return $trenchNameMap;
     }
 
     /**
@@ -89,32 +83,24 @@ class Trench
     public function GetAll($error)
     {
         $trenchSql = "SELECT * FROM trench";
-
-        return $this->ProcessTrench($trenchSql, $error);
+        return $this->ProcessTrench($trenchSql, array(), $error);
     }
 
     /**
      * Short Gets an array of all trench.
      * @param $sql   string The SQL query.
+     * @param $data array the named parameters in the sql query
      * @param $error ErrorResponse The errors if any.
      * @return array the array of all trenches for the given query.
      * if the trench id is unknown an error is returned.
      */
-    private function ProcessTrench($sql, $error)
+    private function ProcessTrench($sql, $data, $error)
     {
-        $trenches = array();
-        $trenchQuery = $this->database->query($sql);
-        if ($trenchQuery) {
-            while ($trenchRow = $trenchQuery->fetch_array(MYSQLI_ASSOC)) {
-                $trenchRow['siteName'] = $this->site->GetName($trenchRow['siteId'], $error);
-                array_push($trenches, $trenchRow);
-            }
-            return $trenches;
-        } else {
-            $error->AddNewError("CRITICAL", $this->database->error);
+        $trenches = $this->common->ExecuteCommand($sql, $data, $error);
+        for ($i = 0; $i < count($trenches); $i++) {
+            $trenches[$i]['siteName'] = $this->site->GetName($trenches[$i]['siteId'], $error);
         }
-
-        return Array();
+        return $trenches;
     }
 
     /**
@@ -126,18 +112,11 @@ class Trench
     {
         $trenchSiteMap = Array();
         $trenchSql = "SELECT id, siteId FROM trench";
-        $trenchQuery = $this->database->query($trenchSql);
-        if ($trenchQuery) {
-            while ($trenchRow = $trenchQuery->fetch_array(MYSQL_ASSOC)) {
-                $trenchSiteMap[$trenchRow['id']] = $trenchRow['siteId'];
-            }
-
-            return $trenchSiteMap;
-        } else {
-            $error->AddNewError("CRITICAL", $this->database->error);
+        $trenches = $this->common->ExecuteCommand($trenchSql, array(), $error);
+        foreach ($trenches as $trench) {
+            $trenchSiteMap[$trench['id']] = $trench['siteId'];
         }
-
-        return Array();
+        return $trenchSiteMap;
     }
 
     /**
@@ -157,11 +136,8 @@ class Trench
         }
 
         if ($error->valid) {
-            $sql = 'Delete from trench WHERE id=' . $id;
-            $deleteQuery = $this->database->query($sql);
-            if (!$deleteQuery) {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
+            $sql = 'DELETE FROM trench WHERE id=:id';
+            $this->common->ExecuteCommand($sql, array(':id' => $id), $error);
         }
     }
 
@@ -179,17 +155,11 @@ class Trench
         $finds = array();
 
         if ($error->valid) {
-            $findsSql = "SELECT * FROM find where trenchId=" . $trench['id'];
-            $findQuery = $this->database->query($findsSql);
-            if ($findQuery) {
-                while ($findRow = $findQuery->fetch_array(MYSQL_ASSOC)) {
-                    $newRow = Array();
-                    $newRow['siteName'] = $siteName;
-                    $newRow['trenchName'] = $trench['name'];
-                    array_push($finds, array_merge($newRow, $findRow));
-                }
-            } else {
-                $error->AddNewError("CRITICAL", $this->database->error);
+            $findsSql = "SELECT * FROM find WHERE trenchId=:id";
+            $finds = $this->common->ExecuteCommand($findsSql, array(':id' => $trench['id']), $error);
+            for ($i = 0; $i < count($finds); $i++) {
+                $finds[$i]['siteName'] = $siteName;
+                $finds[$i]['trenchName'] = $trench['name'];
             }
         }
         return $finds;
@@ -208,9 +178,8 @@ class Trench
             $error->AddNewError("Error", "Unknown trench (id:$id).");
         }
 
-        $trenchSql = "SELECT * FROM trench where id= " . $id;
-
-        return $this->ProcessTrench($trenchSql, $error);
+        $trenchSql = "SELECT * FROM trench WHERE id=:id";
+        return $this->ProcessTrench($trenchSql, array(':id' => $id), $error);
     }
 
     /**
@@ -229,10 +198,10 @@ class Trench
         }
         unset($value);
 
-        $name = $this->common->Recode($data["name"]);
-        $site = $this->common->Recode($data["sites"]);
-        $description = $this->common->Recode($data['description']);
-        $coordinates = $this->common->Recode($data['coordinates']);
+        $name = urldecode($data["name"]);
+        $site = urldecode($data["sites"]);
+        $description = urldecode($data['description']);
+        $coordinates = urldecode($data['coordinates']);
 
         if (!$this->site->Exists($site)) {
             $error->AddNewError("Error", "Unable to add new Trench the Site is unknown");
@@ -244,14 +213,11 @@ class Trench
         $this->common->ValidateLength("Coordinates", $coordinates, 30, $error);
 
         if ($error->valid) {
-            // Add Site Here
-            $sql = 'UPDATE trench SET name="' . $name . '",description="' . $description . '",coordinates="' . $coordinates . '",siteId="' . $site . '" WHERE id=' . $id;
-            $updateQuery = $this->database->query($sql);
-            if ($updateQuery != false) {
-                return $this->GetById($id, $error);
-            } else {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
+
+            $sql = 'UPDATE trench SET name=:name, description=:description, coordinates=:coordinates, siteId=:siteId WHERE id=:id';
+            $data = array(':name' => $name, ':description' => $description, ':coordinates' => $coordinates, ':siteId' => $site, ':id' => $id);
+            $this->common->ExecuteCommand($sql, $data, $error);
+            return $this->GetById($id, $error);
         }
 
         return Array();
@@ -295,10 +261,10 @@ class Trench
             }
             unset($value);
 
-            $name = $this->common->Recode($data["name"]);
-            $site = $this->common->Recode($data["sites"]);
-            $description = $this->common->Recode($data['description']);
-            $coordinates = $this->common->Recode($data['coordinates']);
+            $name = urldecode($data["name"]);
+            $site = urldecode($data["sites"]);
+            $description = urldecode($data['description']);
+            $coordinates = urldecode($data['coordinates']);
 
             $this->ValidateTrenchName($name, $site, $error);
 
@@ -310,15 +276,11 @@ class Trench
             $this->common->ValidateLength("Coordinates", $coordinates, 30, $error);
 
             if ($error->valid) {
-                {
-                    $sql = 'INSERT INTO trench (siteId,name,description,coordinates) VALUES ("' . $site . '","' . $name . '","' . $description . '","' . $coordinates . '")';
-                    $insertQuery = $this->database->query($sql);
-                    if ($insertQuery != false) {
-                        return $this->GetById($this->database->insert_id, $error);
-                    } else {
-                        $error->AddNewError("CRITICAL", $this->database->error);
-                    }
-                }
+
+                $sql = 'INSERT INTO trench (siteId,name,description,coordinates) VALUES (:site,:name,:description,:coordinates)';
+                $data = array(':site' => $site, ':name' => $name, ':description' => $description, ':coordinates' => $coordinates);
+                $this->common->ExecuteCommand($sql, $data, $error);
+                return $this->GetFromName($this->site->GetName($site, $error), $name, $error);
             }
         }
         return Array();

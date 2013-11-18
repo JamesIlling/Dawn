@@ -88,13 +88,13 @@
             foreach ($this->GetTrenches($id,$error) as $trench )
             {
                 $findsSql = "SELECT * FROM find where trenchId= :trenchId";
-                $finds = $this->common->ExecuteCommand($findsSql,array(':trenchId'=>$trench['id']),$error);
-                foreach ($finds as $find)
+                $findsInDb = $this->common->ExecuteCommand($findsSql,array(':trenchId'=>$trench['id']),$error);
+                for ($i=0;$i<count($finds);$i++)
                 {
-                    $find['siteName'] = $siteName;
-                    $find['trenchName'] = $trench['Name'];
+                    $findsInDb[$i]['siteName'] = $siteName;
+                    $findsInDb[$i]['trenchName'] = $trench['Name'];
                 }
-
+                $finds = array_merge($finds,$findsInDb);
             }
             return $finds;
         }

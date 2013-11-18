@@ -14,7 +14,11 @@ $app = new \Slim\Slim(array('debug' => true));
 
 // Configure the connection to the database.
 //               Server     , User  , Password, Database, Port
-$db = new mysqli("localhost", "root", "", "dawn", 7188);
+//$db = new mysqli("localhost", "root", "", "dawn", 7188);
+
+$db=new PDO("mysql:dbname=dawn;host=127.0.0.1;port=3306","root","root");
+$db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+
 $common = new Common($db);
 $site = new Site($common, $db);
 $trench = new Trench($common, $site, $db);

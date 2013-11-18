@@ -8,7 +8,6 @@ $(document).ready(function () {
         var json = JSON.parse(data);
         var id = json['data'][0]['id'];
 
-        if (navigator.onLine) {
             var path;
             var method;
             if (id == '') {
@@ -30,10 +29,7 @@ $(document).ready(function () {
                         alert("Unable to connect to server");
                     }
                 });
-        }
-        else {
-            alert("Unable to connect to server");
-        }
+
         return false;
     });
 });

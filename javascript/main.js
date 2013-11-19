@@ -138,7 +138,7 @@ function InitialiseForm() {
         var grid = $('#mainGrid');
         var selectedRowIndex = grid.jqxGrid('selectedrowindex');
         var data = grid.jqxGrid('getrowdata', selectedRowIndex);
-        var search = "?id=" + data['uid'];
+        var search = "?id=" + data['id'];
         window.location = "../Views/AddFind" + search;
 
     });
@@ -166,6 +166,7 @@ function loadDataGrid(path) {
     var findSource = {
         datatype: "json",
         datafields: [
+            { name: 'id', type: 'string' },
             { name: 'siteName', type: 'string' },
             { name: 'trenchName', type: 'string' },
             { name: 'findNumber', type: 'string' },
@@ -198,7 +199,6 @@ function loadDataGrid(path) {
             { name: 'residues', type: 'string' },
             { name: 'notes',type:'string'}
         ],
-        id: 'id',
         url: path
        // localdata: findData
     };

@@ -1,27 +1,22 @@
 <?php
     require_once 'ErrorResponse.php';
     require_once 'Common.php';
-    //$db = new mysqli("localhost", "my_user", "my_password", "world");
+
 
     /**
-     * Class Site
+     * Class SiteHandler
      */
     class Site
     {
-
-        // The database connection used to query the database.
-        private $database;
         private $common;
 
         /**
          * Short Gets the trenches of the specified site.
          * @param $common Common The common validation to use.
-         * @param $db     mysqli the database connection to use.
          * @return Site A new instance of the site object.
          */
-        public function __construct($common, $db)
+        public function __construct($common)
         {
-            $this->database = $db;
             $this->common = $common;
         }
 
@@ -40,24 +35,11 @@
 
                 return Array();
             }
-            $trenches = array();
-            $trenchesSql = "SELECT * FROM trench WHERE siteId=" . $id;
-            $trenchQuery = $this->database->query($trenchesSql);
-            if ($trenchQuery)
-            {
-                while ($TrenchRow = $trenchQuery->fetch_array(MYSQL_ASSOC))
-                {
-                    array_push($trenches, $TrenchRow);
-                }
 
-                return $trenches;
-            }
-            else
-            {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
+            $trenchesSql = 'SELECT * FROM trench WHERE siteId=:id';
+            $trenches = $this->common->ExecuteCommand($trenchesSql,array(':id'=>$id),$error);
 
-            return Array();
+            return $trenches;
         }
 
         /**
@@ -67,10 +49,10 @@
          */
         public function Exists($id)
         {
-            $siteSql = "SELECT * FROM site WHERE id=" . $id;
-            $siteQuery = $this->database->query($siteSql);
-
-            return $siteQuery->num_rows > 0;
+            $error = new ErrorResponse();
+            $siteSql = 'SELECT COUNT(*) FROM site WHERE id=:id';
+            $sites = $this->common->ExecuteCommand($siteSql,array(':id'=>$id),$error);
+            return $sites > 0;
         }
 
         /**
@@ -80,9 +62,10 @@
          */
         public function NameExists($name)
         {
-            $siteSql = "SELECT * FROM site WHERE name='" . $name."'";
-            $siteQuery = $this->database->query($siteSql);
-            return $siteQuery->num_rows > 0;
+            $error = new ErrorResponse();
+            $siteSql = 'SELECT * FROM site WHERE name=:name';
+            $sites = $this->common->ExecuteCommand($siteSql,array(':name'=>$name),$error);
+            return count($sites) > 0;
         }
 
         /**
@@ -94,45 +77,23 @@
          */
         public function GetFinds($id, &$error)
         {
-
+            $finds = array();
             // Get the name of the site
             $siteName = $this->GetName($id, $error);
-            $trenchIds = Array();
-            $trenchNames = Array();
-            $trenchSql = "SELECT * FROM trench WHERE siteId=" . $id;
-            $trenchQuery = $this->database->query($trenchSql);
-            if ($trenchQuery)
+            foreach ($this->GetTrenches($id,$error) as $trench )
             {
-                while ($trenchRow = $trenchQuery->fetch_array(MYSQL_ASSOC))
+                if (count($trench)>0)
                 {
-                    $trenchNames[$trenchRow['id']] = $trenchRow['name'];
-                    $trenchIds[$trenchRow['id']] = $trenchRow['id'];
-                }
-            }
-            else
-            {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
+                $findsSql = "SELECT * FROM find where trenchId= :trenchId";
+                $findsInDb = $this->common->ExecuteCommand($findsSql,array(':trenchId'=>$trench['id']),$error);
+                for ($i=0;$i<count($findsInDb);$i++)
+                {
 
-            $finds = array();
-            foreach ($trenchIds as $trenchId)
-            {
-                $findsSql = "SELECT * FROM find where trenchId=" . $trenchId;
-                $findQuery = $this->database->query($findsSql);
-                if ($findQuery)
-                {
-                    while ($findRow = $findQuery->fetch_array(MYSQL_ASSOC))
-                    {
-                        $newRow = Array();
-                        $newRow['siteName'] = $siteName;
-                        $newRow['trenchName'] = $trenchNames[$findRow['trenchId']];
-                        array_push($finds, array_merge($newRow, $findRow));
-                    }
+                    $findsInDb[$i]['siteName'] = $siteName;
+                    $findsInDb[$i]['trenchName'] = $trench['name'];
                 }
-                else
-                {
-                    $error->AddNewError("CRITICAL", $this->database->error);
-                }
+                $finds = array_merge($finds,$findsInDb);
+            }
             }
             return $finds;
         }
@@ -140,7 +101,7 @@
         /**
          * Short Gets the name of the specified site.
          * @param $id int The unique identifier of the site.
-         * * @param $error ErrorResponse The error response which is collating the errors for this query.
+         * @param $error ErrorResponse The error response which is collating the errors for this query.
          * @return string The name of the last site with the given Id.
          * There should only ever be one site as it is a primary key.
          * An error is returned if the trench is unknown.
@@ -162,35 +123,27 @@
         /**
          * Short get the mapping of site Id to name.
          * @param $error ErrorResponse The errors if any.
-         * @return array the siteIds by site id
+         * @return array the siteNames by site id
          */
         public function GetNamesById(&$error)
         {
             $siteNameMap = Array();
-            $siteSql = "SELECT id, name FROM site";
-            $siteQuery = $this->database->query($siteSql);
-            if ($siteQuery)
-            {
-                while ($siteRow = $siteQuery->fetch_array(MYSQL_ASSOC))
-                {
-                    $siteNameMap[$siteRow['id']]= $siteRow['name'];
-                }
+            $siteSql = "SELECT * FROM site";
+            $siteInfo = $this->common->ExecuteCommand($siteSql,null,$error);
 
-                return $siteNameMap;
-            }
-            else
+            foreach ($siteInfo as $site)
             {
-                $error->AddNewError("CRITICAL", $this->database->error);
+                $siteNameMap[$site['id']]= $site['name'];
             }
 
-            return Array();
+            return $siteNameMap;
         }
 
         /**
          * Short get the mapping of site Id to name.
          * @param $name string the name of the site
          * @param $error ErrorResponse The errors if any.
-         * @return array the siteIds by site id
+         * @return int the siteIds by site id
          */
         public function GetIdFromName($name,&$error)
         {
@@ -205,11 +158,11 @@
                 {
                     if (strcasecmp($names[$key],$name)==0)
                     {
-                        return $key;
+                        return (int)$key;
                     }
                 }
             }
-            return array();
+            return 0;
         }
 
         /**
@@ -230,12 +183,8 @@
             }
             else
             {
-                $sql = 'Delete from site WHERE id=' . $id;
-                $deleteQuery = $this->database->query($sql);
-                if (!$deleteQuery)
-                {
-                    $error->AddNewError("CRITICAL", $this->database->error);
-                }
+                $sql = 'Delete from site WHERE id=:id';
+                $this->common->ExecuteCommand($sql,array(':id'=>$id),$error);
             }
         }
 
@@ -246,17 +195,17 @@
          */
         private function ContainsTrenches($id)
         {
-            $trenchSql = "SELECT * FROM trench WHERE siteId=" . $id;
-            $trenchQuery = $this->database->query($trenchSql);
-
-            return $trenchQuery->num_rows > 0;
+            $error =new ErrorResponse();
+            $trenchSql = "SELECT * FROM trench WHERE siteId=:id";
+            $trenches = $this->common->ExecuteCommand($trenchSql,array(':id'=> $id),$error);
+            return count($trenches) > 0;
         }
 
         /**
          * Short Insert a Site into te system
          * @param $post       Array The posted data
          * @param $error      ErrorResponse The errors accumulated for this call.
-         * @return Array The inserted item.
+         * @return Site The inserted item.
          */
         public function Insert($post, &$error)
         {
@@ -267,34 +216,31 @@
             }
             unset($value);
 
-            $name = $this->common->Recode($data['name']);
+            $name = urldecode($data['name']);
             $this->ValidateSiteName($name, $error);
 
             $description='';
             if (array_key_exists("description",$data))
             {
-                $description = $this->common->Recode($data['description']);
+                $description = urldecode($data['description']);
                 $this->common->ValidateLength("Description", $description, 200, $error);
             }
 
             $coordinates='';
             if (array_key_exists("coordinates",$data))
             {
-                $coordinates = $this->common->Recode($data['coordinates']);
+                $coordinates = urldecode($data['coordinates']);
                 $this->common->ValidateLength("Coordinates", $coordinates, 30, $error);
             }
 
             if ($error->valid)
             {
-                $sql = 'INSERT INTO site (name,description,coordinates) VALUES ("' . $name . '","' . $description . '","' . $coordinates . '")';
-                $insertQuery = $this->database->query($sql);
-                if ($insertQuery != false)
+                $sql = 'INSERT INTO site (name, description, coordinates) VALUES (:name, :description, :coordinates)';
+                $this->common->ExecuteCommand($sql,array(':name'=>$name,':description'=>$description,':coordinates'=>$coordinates),$error);
+                if ($error->valid)
                 {
-                    return $this->GetById($this->database->insert_id, $error);
-                }
-                else
-                {
-                    $error->AddNewError("CRITICAL", $this->database->error);
+                    $id= $this->GetIdFromName($name,$error);
+                    return $this->GetById($id,$error);
                 }
             }
 
@@ -310,7 +256,6 @@
          */
         function ValidateSiteName($name,& $error, $exclude = -1)
         {
-            $valid = true;
             $sites = $this->GetAll($error);
             for ($index = 0; $index < count($sites); $index++)
             {
@@ -336,43 +281,14 @@
         public function GetAll(&$error)
         {
             $siteSql = "SELECT * FROM site";
-
-            return $this->ProcessSite($siteSql, $error);
-        }
-
-        /**
-         * Short Gets an array of all site.
-         * @param $sql   string The SQL query.
-         * @param $error ErrorResponse The errors if any.
-         * @return array the array of all sites for the given query.
-         * if the site id is unknown an error is returned.
-         */
-        private function ProcessSite($sql, &$error)
-        {
-            $sites = array();
-            $siteQuery = $this->database->query($sql);
-            if ($siteQuery)
-            {
-                while ($siteRow = $siteQuery->fetch_array(MYSQLI_ASSOC))
-                {
-                    array_push($sites, $siteRow);
-                }
-
-                return $sites;
-            }
-            else
-            {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
-
-            return Array();
+            return $this->common->ExecuteCommand($siteSql,null, $error);
         }
 
         /**
          * Short Get a site by id
          * @param $id    int The unique identifier of the site.
          * @param $error ErrorResponse The errors if any.
-         * @return array the array of all sites with the given id.
+         * @return Site the array of all sites with the given id.
          * An error is returned if the site is not known.
          */
         public function GetById($id,& $error)
@@ -382,9 +298,8 @@
                 $error->AddNewError("Error", "Unknown site (id:$id).");
             }
 
-            $siteSql = "SELECT * FROM site where id= " . $id;
-
-            return $this->ProcessSite($siteSql, $error);
+            $siteSql = "SELECT * FROM site where id=:id";
+            return $this->common->ExecuteCommand($siteSql,array(':id'=>$id), $error);
         }
 
         /**
@@ -392,7 +307,7 @@
          * @param $id         int the Unique id of the site.
          * @param $put        Array The put data
          * @param $error      ErrorResponse The errors accumulated for this call.
-         * @return Array The inserted item.
+         * @return Site The inserted item.
          */
         public function Update($id, $put, &$error)
         {
@@ -403,25 +318,19 @@
             }
             unset($value);
 
-            $name = $this->common->Recode($data['name']);
-            $description = $this->common->Recode($data['description']);
-            $coordinates = $this->common->Recode($data['coordinates']);
+            $name = urldecode($data['name']);
+            $description = urldecode($data['description']);
+            $coordinates = urldecode($data['coordinates']);
 
             $this->ValidateSiteName($name, $error, $id);
             $this->common->ValidateLength("Description", $description, 200, $error);
             $this->common->ValidateLength("Coordinates", $coordinates, 30, $error);
             if ($error->valid)
             {
-                $sql = 'UPDATE site SET name="' . $name . '",description="' . $description . '",coordinates="' . $coordinates . '" WHERE id=' . $id;
-                $update = $this->database->query($sql);
-                if (!$update == false)
-                {
-                    return $this->GetById($id, $error);
-                }
-                else
-                {
-                    $error->AddNewError("CRITICAL", $this->database->error);
-                }
+                $sql='UPDATE site SET name=:name, description=:description, coordinates=:coordinates WHERE id=:id';
+                $params = array(':name'=>$name,':description'=>$description,':coordinates'=>$coordinates,':id'=>$id);
+                $this->common->ExecuteCommand($sql,$params,$error);
+                return $this->GetById($id,$error);
             }
 
             return Array();

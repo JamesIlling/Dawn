@@ -3,31 +3,22 @@
     require_once 'Site.php';
     require_once 'Trench.php';
     require_once 'Common.php';
-    //$db = new mysqli("localhost", "my_user", "my_password", "world");
-
-    /**
-     * Class Find
-     */
-    class Find
+    
+class Find
     {
-
-        // The database connection used to query the database.
-        private $database;
         private $trench;
         private $site;
         private $common;
 
         /**
          * Short Creates a new class to handle finds.
-         * @param $db     mysqli the database connection to use.
          * @param $trench Trench The Trench handling object
          * @param $site   Site The site handling object.
          * @param $common Common The common validation.
          * @return Find A new instance of the find object.
          */
-        public function __construct($db, $site, $trench, $common)
+        public function __construct($site, $trench, $common)
         {
-            $this->database = $db;
             $this->site = $site;
             $this->trench = $trench;
             $this->common = $common;
@@ -40,7 +31,7 @@
         public function GetAll($error)
         {
             $sql = $findsSql = "SELECT * FROM find";
-            $finds = $this->ProcessFinds($sql, $error);;
+            $finds = $this->ProcessFinds($sql,null, $error);;
             return $finds;
         }
 
@@ -52,9 +43,8 @@
         private function Exists($id)
         {
             $findSql = "SELECT * FROM find WHERE id=" . $id;
-            $findQuery = $this->database->query($findSql);
-
-            return $findQuery->num_rows > 0;
+            $finds = $this->common->ExecuteCommand($findSql,null,new ErrorResponse());
+            return count($finds) > 0;
         }
 
         /**
@@ -72,19 +62,19 @@
             }
 
             $sql = $findsSql = "SELECT * FROM find where id=" . $id;
-
-            $finds =  $this->ProcessFinds($sql, $error);
+            $finds =  $this->ProcessFinds($sql,null,$error);
             return $finds;
         }
 
         /**
          * Short Gets an array of all find.
          * @param $sql   string The SQL query.
+         * @param $data  array The named parameters used for the SQL query
          * @param $error ErrorResponse The errors if any.
          * @return array the array of all finds for the given query.
          * if the find id is unknown an error is returned.
          */
-        public function ProcessFinds($sql, $error)
+        public function ProcessFinds($sql,$data, $error)
         {
             $finds = array();
             $trenchSiteMapping = $this->trench->GetTrenchSiteMap($error);
@@ -93,20 +83,16 @@
 
             if ($error->valid)
             {
-                $findQuery = $this->database->query($sql);
-                if ($findQuery)
+                $finds = $this->common->ExecuteCommand($sql,$data,$error);
+                for ($i =0 ;$i > count($finds);$i++)
                 {
-                    while ($findRow = $findQuery->fetch_array(MYSQLI_ASSOC))
-                    {
-                        $findRow['siteName'] = $siteNames[$trenchSiteMapping[$findRow['trenchId']]];
-                        $findRow['trenchName'] = $trenchNames[$findRow['trenchId']];
-                        array_push($finds, $findRow);
-                    }
+                        $finds[$i]['siteName'] = $siteNames[$trenchSiteMapping[$finds[$i]['trenchId']]];
+                        $finds[$i]['trenchName'] = $trenchNames[$finds[$i]['trenchId']];
+                  
                 }
-                               return $finds;
             }
 
-            return Array();
+            return $finds;
         }
 
         /**
@@ -117,27 +103,29 @@
          */
         public function Insert($post, $error)
         {
+
             $data = array();
-            foreach ($post as &$value)
+            foreach ($post as $value)
             {
                 $data = $data + $value;
             }
             unset($value);
 
-            $trenchId = $this->common->Recode($data['trenchId']);
-            $findNumber = $this->common->Recode($data['findNumber']);
+            $trenchId = urldecode($data['trenchId']);
+            $findNumber = urldecode($data['findNumber']);
 
             $context='';
             if (array_key_exists("context",$data))
             {
-                $context = $this->common->Recode($data['context']);
+
+                $context = urldecode($data['context']);
                 $this->common->ValidateLength("context", $context, 200, $error);
             }
 
             $numberOfSherds='';
             if (array_key_exists("numSherds",$data))
             {
-                $numberOfSherds = $this->common->Recode($data['numSherds']);
+                $numberOfSherds = urldecode($data['numSherds']);
                 $this->common->ValidateNumber("Number of sherds",$numberOfSherds,$error);
                 $this->common->ValidateLength("Number of sherds", $numberOfSherds, 200, $error);
             }
@@ -145,180 +133,185 @@
             $coordinates='';
             if (array_key_exists("coordinates",$data))
             {
-                $coordinates = $this->common->Recode($data['coordinates']);
+                $coordinates = urldecode($data['coordinates']);
                 $this->common->ValidateLength("coordinates", $coordinates, 200, $error);
             }
 
             $sherdType='';
             if (array_key_exists("sherdType",$data))
             {
-                $sherdType = $this->common->Recode($data['sherdType']);
+                $sherdType = urldecode($data['sherdType']);
                 $this->common->ValidateLength("sherdType", $sherdType, 200, $error);
             }
 
             $fabricType='';
             if (array_key_exists("fabricType",$data))
             {
-                $fabricType = $this->common->Recode($data['fabricType']);
+                $fabricType = urldecode($data['fabricType']);
                 $this->common->ValidateLength("fabricType", $fabricType, 200, $error);
             }
-
             $fabricTypeCode='';
             if (array_key_exists("fabricTypeCode",$data))
             {
-                $fabricTypeCode = $this->common->Recode($data['fabricTypeCode']);
+                $fabricTypeCode = urldecode($data['fabricTypeCode']);
                 $this->common->ValidateLength("fabricTypeCode", $fabricTypeCode, 200, $error);
             }
-
             $wareType='';
             if (array_key_exists("wareType",$data))
             {
-                $wareType = $this->common->Recode($data['wareType']);
+                $wareType = urldecode($data['wareType']);
                 $this->common->ValidateLength("wareType", $wareType, 200, $error);
             }
+
             $baseType='';
             if (array_key_exists("baseType",$data))
             {
-                $baseType = $this->common->Recode($data['baseType']);
+                $baseType = urldecode($data['baseType']);
                 $this->common->ValidateLength("baseType", $baseType, 200, $error);
             }
             $rimType='';
             if (array_key_exists("rimType",$data))
             {
-                $rimType = $this->common->Recode($data['rimType']);
+                $rimType = urldecode($data['rimType']);
                 $this->common->ValidateLength("rimType",$rimType, 200, $error);
             }
+
             $fabricColour='';
             if (array_key_exists("fabricColour",$data))
             {
-                $fabricColour = $this->common->Recode($data['fabricColour']);
+                $fabricColour = urldecode($data['fabricColour']);
                 $this->common->ValidateLength("fabricColour", $fabricColour, 200, $error);
             }
             $construction='';
             if (array_key_exists("construction",$data))
             {
-                $construction = $this->common->Recode($data['construction']);
+                $construction = urldecode($data['construction']);
                 $this->common->ValidateLength("construction", $construction, 200, $error);
             }
-
             $height='';
             if (array_key_exists("height",$data))
             {
-                $height = $this->common->Recode($data['height']);
+                $height = urldecode($data['height']);
                 $this->common->ValidateLength("height", $height, 200, $error);
             }
             $width='';
             if (array_key_exists("width",$data))
             {
-                $width = $this->common->Recode($data['width']);
+                $width = urldecode($data['width']);
                 $this->common->ValidateLength("width", $width, 200, $error);
             }
             $thickness='';
             if (array_key_exists("thickness",$data))
             {
-                $thickness = $this->common->Recode($data['thickness']);
+                $thickness = urldecode($data['thickness']);
                 $this->common->ValidateLength("thickness", $thickness, 200, $error);
             }
-
             $weight='';
             if (array_key_exists("Weight",$data))
             {
-                $weight = $this->common->Recode($data['Weight']);
+                $weight = urldecode($data['Weight']);
                 $this->common->ValidateLength("Weight", $weight, 200, $error);
             }
             $rimDiameter='';
             if (array_key_exists("rimDiameter",$data))
             {
-                $rimDiameter = $this->common->Recode($data['rimDiameter']);
+                $rimDiameter = urldecode($data['rimDiameter']);
                 $this->common->ValidateLength("rimDiameter", $rimDiameter, 200, $error);
             }
             $baseDiameter='';
             if (array_key_exists("baseDiameter",$data))
             {
-                $baseDiameter = $this->common->Recode($data['baseDiameter']);
+                $baseDiameter = urldecode($data['baseDiameter']);
                 $this->common->ValidateLength("baseDiameter", $baseDiameter, 200, $error);
             }
             $temperQuality='';
             if (array_key_exists("temperQuality",$data))
             {
-                $temperQuality = $this->common->Recode($data['temperQuality']);
+                $temperQuality = urldecode($data['temperQuality']);
                 $this->common->ValidateLength("temperQuality", $temperQuality, 200, $error);
             }
-
             $surfaceTreatment='';
             if (array_key_exists("surfaceTreatment",$data))
             {
-                $surfaceTreatment = $this->common->Recode($data['surfaceTreatment']);
+                $surfaceTreatment = urldecode($data['surfaceTreatment']);
                 $this->common->ValidateLength("surfaceTreatment", $surfaceTreatment, 200, $error);
             }
+
             $temperType='';
             if (array_key_exists("temperType",$data))
             {
-                $temperType = $this->common->Recode($data['temperType']);
+                $temperType = urldecode($data['temperType']);
                 $this->common->ValidateLength("temperType", $temperType, 200, $error);
             }
 
             $manufacture='';
             if (array_key_exists("manufacture",$data))
             {
-                $manufacture = $this->common->Recode($data['manufacture']);
+                $manufacture = urldecode($data['manufacture']);
                 $this->common->ValidateLength("manufacture", $manufacture, 200, $error);
             }
+
             $sherdCondition='';
             if (array_key_exists("sherdCondition",$data))
             {
-                $sherdCondition = $this->common->Recode($data['sherdCondition']);
+                $sherdCondition = urldecode($data['sherdCondition']);
                 $this->common->ValidateLength("sherdCondition", $sherdCondition, 200, $error);
             }
+
             $decoration='';
             if (array_key_exists("decoration",$data))
             {
-                $decoration = $this->common->Recode($data['decoration']);
+                $decoration = urldecode($data['decoration']);
                 $this->common->ValidateLength("decoration", $decoration, 200, $error);
             }
 
             $analysisType='';
             if (array_key_exists("scientificAnalysisType",$data))
             {
-                $analysisType = $this->common->Recode($data['scientificAnalysisType']);
+                $analysisType = urldecode($data['scientificAnalysisType']);
                 $this->common->ValidateLength("scientificAnalysisType", $analysisType, 200, $error);
             }
+
             $sampleNumber='';
             if (array_key_exists("sampleNumber",$data))
             {
-                $sampleNumber = $this->common->Recode($data['sampleNumber']);
+                $sampleNumber = urldecode($data['sampleNumber']);
                 $this->common->ValidateLength("sampleNumber", $sampleNumber, 200, $error);
             }
+
             $minimumNumberOfVessels='';
             if (array_key_exists("mnvRepresented",$data))
             {
-                $minimumNumberOfVessels = $this->common->Recode($data['mnvRepresented']);
+                $minimumNumberOfVessels = urldecode($data['mnvRepresented']);
                 $this->common->ValidateLength("mnvRepresented", $minimumNumberOfVessels, 200, $error);
             }
+
             $residues='';
             if (array_key_exists("residues",$data))
             {
-                $residues = $this->common->Recode($data['residues']);
+                $residues = urldecode($data['residues']);
                 $this->common->ValidateLength("residues", $residues, 200, $error);
             }
 
             $notes='';
             if (array_key_exists("notes",$data))
             {
-                $notes = $this->common->Recode($data['notes']);
+                $notes = urldecode($data['notes']);
                 $this->common->ValidateLength("notes", $notes, 1000, $error);
             }
 
             if ($error->valid)
             {
-                $sql = "INSERT INTO find (trenchId,findNumber,context,numberOfSherds,coordinates,sherdType,fabricType,fabricTypeCode,wareType,baseType,rimType,fabricColour,construction,height,width,thickness,weight,rimDiameter,baseDiameter,surfaceTreatment,temperType,temperQuality,manufacture,sherdCondition,decoration,analysisType,sampleNumber,minimumNumberOfVessels,residues,notes)VALUES('$trenchId','$findNumber','$context','$numberOfSherds','$coordinates','$sherdType','$fabricType','$fabricTypeCode','$wareType','$baseType','$rimType','$fabricColour','$construction','$height','$width','$thickness','$weight','$rimDiameter','$baseDiameter','$surfaceTreatment','$temperType','$temperQuality','$manufacture','$sherdCondition','$decoration','$analysisType','$sampleNumber','$minimumNumberOfVessels','$residues','$notes')";
-                $insertQuery = $this->database->query($sql);
-                if ($insertQuery != false)
+                $sql = 'INSERT INTO find (trenchId,findNumber,context,numberOfSherds,coordinates,sherdType,fabricType,fabricTypeCode,wareType,baseType,rimType,fabricColour,construction,height,width,thickness,weight,rimDiameter,baseDiameter,surfaceTreatment,temperType,temperQuality,manufacture,sherdCondition,decoration,analysisType,sampleNumber,minimumNumberOfVessels,residues,notes)VALUES(:trenchId,:findNumber,:context,:numberOfSherds,:coordinates,:sherdType,:fabricType,:fabricTypeCode,:wareType,:baseType,:rimType,:fabricColour,:construction,:height,:width,:thickness,:weight,:rimDiameter,:baseDiameter,:surfaceTreatment,:temperType,:temperQuality,:manufacture,:sherdCondition,:decoration,:analysisType,:sampleNumber,:minimumNumberOfVessels,:residues,:notes)';
+                $data = array(':trenchId'=>$trenchId,':findNumber'=>$findNumber,':context'=>$context,':numberOfSherds'=>$numberOfSherds,':coordinates'=>$coordinates,':sherdType'=>$sherdType,':fabricType'=>$fabricType,':fabricTypeCode'=>$fabricTypeCode,':wareType'=>$wareType,':baseType'=>$baseType,':rimType'=>$rimType,':fabricColour'=>$fabricColour,':construction'=>$construction,':height'=>$height,':width'=>$width,':thickness'=>$thickness,':weight'=>$weight,':rimDiameter'=>$rimDiameter,':baseDiameter'=>$baseDiameter,':surfaceTreatment'=>$surfaceTreatment,':temperType'=>$temperType,':temperQuality'=>$temperQuality,':manufacture'=>$manufacture,':sherdCondition'=>$sherdCondition,':decoration'=>$decoration,':analysisType'=>$analysisType,':sampleNumber'=>$sampleNumber,':minimumNumberOfVessels'=>$minimumNumberOfVessels,':residues'=>$residues,':notes'=>$notes);
+
+                $this->common->ExecuteCommand($sql,$data,$error);
+                if ($error->valid)
                 {
-                    return $this->GetById($this->database->insert_id, $error);
+
+                    return $this->GetById($this->common->GetLastInsertId($error), $error);
                 }
             }
-
             return array();
         }
 
@@ -344,20 +337,20 @@
             }
             unset($value);
 
-            $trenchId = $this->common->Recode($data['trenchId']);
-            $findNumber = $this->common->Recode($data['findNumber']);
+            $trenchId = urldecode($data['trenchId']);
+            $findNumber = urldecode($data['findNumber']);
 
             $context='';
             if (array_key_exists("context",$data))
             {
-                $context = $this->common->Recode($data['context']);
+                $context = urldecode($data['context']);
                 $this->common->ValidateLength("context", $context, 200, $error);
             }
 
             $numberOfSherds='';
             if (array_key_exists("numSherds",$data))
             {
-                $numberOfSherds = $this->common->Recode($data['numSherds']);
+                $numberOfSherds = urldecode($data['numSherds']);
                 $this->common->ValidateNumber("Number of sherds",$numberOfSherds,$error);
                 $this->common->ValidateLength("Number of sherds", $numberOfSherds, 200, $error);
             }
@@ -365,185 +358,177 @@
             $coordinates='';
             if (array_key_exists("coordinates",$data))
             {
-                $coordinates = $this->common->Recode($data['coordinates']);
+                $coordinates = urldecode($data['coordinates']);
                 $this->common->ValidateLength("coordinates", $coordinates, 200, $error);
             }
 
             $sherdType='';
             if (array_key_exists("sherdType",$data))
             {
-                $sherdType = $this->common->Recode($data['sherdType']);
+                $sherdType = urldecode($data['sherdType']);
                 $this->common->ValidateLength("sherdType", $sherdType, 200, $error);
             }
 
             $fabricType='';
             if (array_key_exists("fabricType",$data))
             {
-                $fabricType = $this->common->Recode($data['fabricType']);
+                $fabricType = urldecode($data['fabricType']);
                 $this->common->ValidateLength("fabricType", $fabricType, 200, $error);
             }
 
             $fabricTypeCode='';
             if (array_key_exists("fabricTypeCode",$data))
             {
-                $fabricTypeCode = $this->common->Recode($data['fabricTypeCode']);
+                $fabricTypeCode = urldecode($data['fabricTypeCode']);
                 $this->common->ValidateLength("fabricTypeCode", $fabricTypeCode, 200, $error);
             }
 
             $wareType='';
             if (array_key_exists("wareType",$data))
             {
-                $wareType = $this->common->Recode($data['wareType']);
+                $wareType = urldecode($data['wareType']);
                 $this->common->ValidateLength("wareType", $wareType, 200, $error);
             }
             $baseType='';
             if (array_key_exists("baseType",$data))
             {
-                $baseType = $this->common->Recode($data['baseType']);
+                $baseType = urldecode($data['baseType']);
                 $this->common->ValidateLength("baseType", $baseType, 200, $error);
             }
             $rimType='';
             if (array_key_exists("rimType",$data))
             {
-                $rimType = $this->common->Recode($data['rimType']);
+                $rimType = urldecode($data['rimType']);
                 $this->common->ValidateLength("rimType",$rimType, 200, $error);
             }
             $fabricColour='';
             if (array_key_exists("fabricColour",$data))
             {
-                $fabricColour = $this->common->Recode($data['fabricColour']);
+                $fabricColour = urldecode($data['fabricColour']);
                 $this->common->ValidateLength("fabricColour", $fabricColour, 200, $error);
             }
             $construction='';
             if (array_key_exists("construction",$data))
             {
-                $construction = $this->common->Recode($data['construction']);
+                $construction = urldecode($data['construction']);
                 $this->common->ValidateLength("construction", $construction, 200, $error);
             }
 
             $height='';
             if (array_key_exists("height",$data))
             {
-                $height = $this->common->Recode($data['height']);
+                $height = urldecode($data['height']);
                 $this->common->ValidateLength("height", $height, 200, $error);
             }
             $width='';
             if (array_key_exists("width",$data))
             {
-                $width = $this->common->Recode($data['width']);
+                $width = urldecode($data['width']);
                 $this->common->ValidateLength("width", $width, 200, $error);
             }
             $thickness='';
             if (array_key_exists("thickness",$data))
             {
-                $thickness = $this->common->Recode($data['thickness']);
+                $thickness = urldecode($data['thickness']);
                 $this->common->ValidateLength("thickness", $thickness, 200, $error);
             }
 
             $weight='';
             if (array_key_exists("Weight",$data))
             {
-                $weight = $this->common->Recode($data['Weight']);
+                $weight = urldecode($data['Weight']);
                 $this->common->ValidateLength("Weight", $weight, 200, $error);
             }
             $rimDiameter='';
             if (array_key_exists("rimDiameter",$data))
             {
-                $rimDiameter = $this->common->Recode($data['rimDiameter']);
+                $rimDiameter = urldecode($data['rimDiameter']);
                 $this->common->ValidateLength("rimDiameter", $rimDiameter, 200, $error);
             }
             $baseDiameter='';
             if (array_key_exists("baseDiameter",$data))
             {
-                $baseDiameter = $this->common->Recode($data['baseDiameter']);
+                $baseDiameter = urldecode($data['baseDiameter']);
                 $this->common->ValidateLength("baseDiameter", $baseDiameter, 200, $error);
             }
             $temperQuality='';
             if (array_key_exists("temperQuality",$data))
             {
-                $temperQuality = $this->common->Recode($data['temperQuality']);
+                $temperQuality = urldecode($data['temperQuality']);
                 $this->common->ValidateLength("temperQuality", $temperQuality, 200, $error);
             }
 
             $surfaceTreatment='';
             if (array_key_exists("surfaceTreatment",$data))
             {
-                $surfaceTreatment = $this->common->Recode($data['surfaceTreatment']);
+                $surfaceTreatment = urldecode($data['surfaceTreatment']);
                 $this->common->ValidateLength("surfaceTreatment", $surfaceTreatment, 200, $error);
             }
             $temperType='';
             if (array_key_exists("temperType",$data))
             {
-                $temperType = $this->common->Recode($data['temperType']);
+                $temperType = urldecode($data['temperType']);
                 $this->common->ValidateLength("temperType", $temperType, 200, $error);
             }
 
             $manufacture='';
             if (array_key_exists("manufacture",$data))
             {
-                $manufacture = $this->common->Recode($data['manufacture']);
+                $manufacture = urldecode($data['manufacture']);
                 $this->common->ValidateLength("manufacture", $manufacture, 200, $error);
             }
             $sherdCondition='';
             if (array_key_exists("sherdCondition",$data))
             {
-                $sherdCondition = $this->common->Recode($data['sherdCondition']);
+                $sherdCondition = urldecode($data['sherdCondition']);
                 $this->common->ValidateLength("sherdCondition", $sherdCondition, 200, $error);
             }
             $decoration='';
             if (array_key_exists("decoration",$data))
             {
-                $decoration = $this->common->Recode($data['decoration']);
+                $decoration = urldecode($data['decoration']);
                 $this->common->ValidateLength("decoration", $decoration, 200, $error);
             }
 
             $analysisType='';
             if (array_key_exists("scientificAnalysisType",$data))
             {
-                $analysisType = $this->common->Recode($data['scientificAnalysisType']);
+                $analysisType = urldecode($data['scientificAnalysisType']);
                 $this->common->ValidateLength("scientificAnalysisType", $analysisType, 200, $error);
             }
             $sampleNumber='';
             if (array_key_exists("sampleNumber",$data))
             {
-                $sampleNumber = $this->common->Recode($data['sampleNumber']);
+                $sampleNumber = urldecode($data['sampleNumber']);
                 $this->common->ValidateLength("sampleNumber", $sampleNumber, 200, $error);
             }
             $minimumNumberOfVessels='';
             if (array_key_exists("mnvRepresented",$data))
             {
-                $minimumNumberOfVessels = $this->common->Recode($data['mnvRepresented']);
+                $minimumNumberOfVessels = urldecode($data['mnvRepresented']);
                 $this->common->ValidateLength("mnvRepresented", $minimumNumberOfVessels, 200, $error);
             }
             $residues='';
             if (array_key_exists("residues",$data))
             {
-                $residues = $this->common->Recode($data['residues']);
+                $residues = urldecode($data['residues']);
                 $this->common->ValidateLength("context", $residues, 200, $error);
             }
             $notes='';
             if (array_key_exists("notes",$data))
             {
-                $notes = $this->common->Recode($data['notes']);
+                $notes = urldecode($data['notes']);
                 $this->common->ValidateLength("notes", $notes, 1000, $error);
             }
 
             if ($error->valid)
             {
-
-                $sql = "UPDATE find SET  trenchId='$trenchId',findNumber='$findNumber',context='$context',numberOfSherds='$numberOfSherds',coordinates='$coordinates',sherdType='$sherdType',fabricType='$fabricType',fabricTypeCode='$fabricTypeCode',wareType='$wareType',baseType='$baseType',rimType='$rimType',fabricColour='$fabricColour',construction='$construction',height='$height',width='$width',thickness='$thickness',weight='$weight',rimDiameter='$rimDiameter',baseDiameter='$baseDiameter',surfaceTreatment='$surfaceTreatment',temperType='$temperType',temperQuality='$temperQuality',manufacture='$manufacture',sherdCondition='$sherdCondition',decoration='$decoration',analysisType='$analysisType',sampleNumber='$sampleNumber',minimumNumberOfVessels='$minimumNumberOfVessels',residues='$residues',notes='$notes' WHERE id='$id'";
-                $insertQuery = $this->database->query($sql);
-                if ($insertQuery != false)
-                {
-                    return $this->GetById($id, $error);
-                }
+                $sql = "UPDATE find SET  trenchId=:trenchId,findNumber=:findNumber,context=:context,numberOfSherds=:numberOfSherds,coordinates=:coordinates,sherdType=:sherdType,fabricType=:fabricType,fabricTypeCode=:fabricTypeCode,wareType=:$wareType,baseType=:baseType,rimType=:rimType,fabricColour=:fabricColour,construction=:construction,height=:height,width=:width,thickness=:thickness,weight=:weight,rimDiameter=:rimDiameter,baseDiameter=:baseDiameter,surfaceTreatment=:surfaceTreatment,temperType=:temperType,temperQuality=:temperQuality,manufacture=:manufacture,sherdCondition=:sherdCondition,decoration=:decoration,analysisType=:analysisType,sampleNumber=:sampleNumber,minimumNumberOfVessels=:minimumNumberOfVessels,residues=:residues,notes=:notes WHERE id=:id";
+                $data = array(':trenchId'=>$trenchId,':findNumber'=>$findNumber,':context'=>$context,':numberOfSherds'=>$numberOfSherds,':coordinates'=>$coordinates,':sherdType'=>$sherdType,':fabricType'=>$fabricType,':fabricTypeCode'=>$fabricTypeCode,':wareType'=>$wareType,':baseType'=>$baseType,':rimType'=>$rimType,':fabricColour'=>$fabricColour,':construction'=>$construction,':height'=>$height,':width'=>$width,':thickness'=>$thickness,':weight'=>$weight,':rimDiameter'=>$rimDiameter,':baseDiameter'=>$baseDiameter,':surfaceTreatment'=>$surfaceTreatment,':temperType'=>$temperType,':temperQuality'=>$temperQuality,':manufacture'=>$manufacture,':sherdCondition'=>$sherdCondition,':decoration'=>$decoration,':analysisType'=>$analysisType,':sampleNumber'=>$sampleNumber,':minimumNumberOfVessels'=>$minimumNumberOfVessels,':residues'=>$residues,':notes'=>$notes,':id'=>$id);
+                $this->common->ExecuteCommand($sql,$data,$error);
+                return $this->GetById($id, $error);
             }
-            else
-            {
-                $error->AddNewError("CRITICAL", $this->database->error);
-            }
-
-            return Array();
+            return array();
         }
 
         /**
@@ -557,16 +542,8 @@
             if ($this->Exists($id))
             {
 
-                $sql = 'Delete from find WHERE id=' . $id;
-                $deleteQuery = $this->database->query($sql);
-                if ($deleteQuery != false)
-                {
-                   return;
-                }
-                else
-                {
-                    $error->AddNewError("CRITICAL", $this->database->error);
-                }
+                $sql = 'Delete from find WHERE id=:id';
+                $this->common->ExecuteCommand($sql,array(':id'=>$id),$error);
             }
             else
             {

@@ -20,9 +20,9 @@ $db=new PDO("mysql:dbname=dawn;host=127.0.0.1;port=3306","root","root");
 $db->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
 $common = new Common($db);
-$site = new Site($common, $db);
-$trench = new Trench($common, $site, $db);
-$find = new Find($db, $site, $trench, $common);
+$site = new Site($common);
+$trench = new Trench($common, $site);
+$find = new Find( $site, $trench, $common);
 $export = new Export($site, $trench);
 
 //===========================================================================

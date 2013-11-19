@@ -26,24 +26,11 @@
             if (strlen($string) > $length)
             {
                 $error->AddNewError("Error", "The ($name) value ($string) is too long the maximum length is $length");
-
                 return false;
             }
-
             return true;
         }
 
-        /**
-         * Short recode a string from UrlEncoded to database encoded.
-         * @param $urlEncodedString string the text to recode
-         * @return string the recoded string.
-         *//*
-        public function Recode($urlEncodedString)
-        {
-            $decoded = urldecode($urlEncodedString);
-
-            return $this->database->quote($decoded);
-        }*/
 
         /**
          * Short EEnsure that the provided string is a valid number
@@ -88,6 +75,18 @@
                     $error->AddNewError("ERROR",$exception->getMessage());
             }
             return array();
+        }
+
+        public function GetLastInsertId($error)
+        {
+            try
+            {
+                return $this->database->lastInsertId();
+            }
+            catch (PDOException $exception)
+            {
+                $error->AddNewError("ERROR",$exception->getMessage());
+            }
         }
     }
 ?>

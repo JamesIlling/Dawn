@@ -8,20 +8,15 @@
      */
     class Site
     {
-
-        // The database connection used to query the database.
-        private $database;
         private $common;
 
         /**
          * Short Gets the trenches of the specified site.
          * @param $common Common The common validation to use.
-         * @param $db     PDO the database connection to use.
          * @return Site A new instance of the site object.
          */
-        public function __construct($common, $db)
+        public function __construct($common)
         {
-            $this->database = $db;
             $this->common = $common;
         }
 
@@ -87,14 +82,18 @@
             $siteName = $this->GetName($id, $error);
             foreach ($this->GetTrenches($id,$error) as $trench )
             {
+                if (count($trench)>0)
+                {
                 $findsSql = "SELECT * FROM find where trenchId= :trenchId";
                 $findsInDb = $this->common->ExecuteCommand($findsSql,array(':trenchId'=>$trench['id']),$error);
-                for ($i=0;$i<count($finds);$i++)
+                for ($i=0;$i<count($findsInDb);$i++)
                 {
+
                     $findsInDb[$i]['siteName'] = $siteName;
-                    $findsInDb[$i]['trenchName'] = $trench['Name'];
+                    $findsInDb[$i]['trenchName'] = $trench['name'];
                 }
                 $finds = array_merge($finds,$findsInDb);
+            }
             }
             return $finds;
         }

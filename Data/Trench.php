@@ -7,9 +7,6 @@ require_once 'Site.php';
  */
 class Trench
 {
-
-    // The database connection used to query the database.
-    private $database;
     private $site;
     private $common;
 
@@ -17,12 +14,10 @@ class Trench
      * Short Create a new trench object
      * @param common Common the common validation to use,
      * @param $site  Site The site handler.
-     * @param $db    PDO the database connection to use.
      * @return Trench A new instance of the Trench object.
      */
-    public function __construct($common, $site, $db)
+    public function __construct($common, $site)
     {
-        $this->database = $db;
         $this->common = $common;
         $this->site = $site;
     }

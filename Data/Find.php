@@ -84,11 +84,11 @@ class Find
             if ($error->valid)
             {
                 $finds = $this->common->ExecuteCommand($sql,$data,$error);
-                for ($i =0 ;$i > count($finds);$i++)
+                for ($i =0 ;$i < count($finds);$i++)
                 {
+
                         $finds[$i]['siteName'] = $siteNames[$trenchSiteMapping[$finds[$i]['trenchId']]];
                         $finds[$i]['trenchName'] = $trenchNames[$finds[$i]['trenchId']];
-                  
                 }
             }
 

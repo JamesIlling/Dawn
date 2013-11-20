@@ -15,13 +15,13 @@
 }
 
 function RemoveRemote(remoteUrl) {
-    $responce = $.ajax({
+    var response = $.ajax({
         type: "DELETE",
         url: remoteUrl,
         async: false
     }).responseText;
-    if ($responce != 'OK') {
-        alert($responce);
+    if (response != 'OK') {
+        alert(response);
     }
     else {
         window.location.reload();
@@ -43,7 +43,7 @@ function InitialiseForm() {
         var site = sites[s];
         site['treeId'] = site.id;
         site['value'] = "sites/" + site.id + "/finds";
-        site['icon'] = "../icons/Colosseum Of Rome.png";
+        site['icon'] = "../icons/treeViewSiteIcon.png";
         site['parentId'] = -1;
         data.push(site);
         // Get the trenches for the site.
@@ -53,7 +53,7 @@ function InitialiseForm() {
             trench['treeId'] = site.id + "." + trench.id;
             trench['value'] = "trenches/" + trench.id + "/finds";
             trench['parentId'] = site.id;
-            trench['icon'] = "../icons/Spade.png";
+            trench['icon'] = "../icons/treeViewTrenchIcon.png";
             data.push(trench);
         }
     }
@@ -102,34 +102,13 @@ function InitialiseForm() {
             RemoveRemote(getServiceLocation() + "" + path);
         }
     });
-    $("#Main").click(function () {
-        window.location = "../Views/Main.html";
-    });
-
-    $("#AddFind").click(function () {
-        window.location = "../Views/AddFind.html";
-    });
-    $("#AddTrench").click(function () {
-        window.location = "../Views/AddTrench.html";
-    });
-    $("#AddSite").click(function () {
-        window.location = "../Views/AddSite.html";
-    });
-
-    $("#Settings").click(function () {
-        window.location = "../Views/settings.html";
-    });
-
-    $("#Upload").click(function () {
-        window.location = "../Views/Upload.html";
-    });
 
     $("#DeleteSelected").click(function () {
         var grid = $('#mainGrid');
         var selectedRowIndex = grid.jqxGrid('selectedrowindex');
         if (selectedRowIndex != null) {
             var data = grid.jqxGrid('getrowdata', selectedRowIndex);
-            $path = getServiceLocation() + "finds/" + data['uid'];
+            $path = getServiceLocation() + "finds/" + data['id'];
             RemoveRemote($path);
         }
     });
@@ -138,9 +117,11 @@ function InitialiseForm() {
         var grid = $('#mainGrid');
         var selectedRowIndex = grid.jqxGrid('selectedrowindex');
         var data = grid.jqxGrid('getrowdata', selectedRowIndex);
+        if (data != null)
+        {
         var search = "?id=" + data['id'];
-        window.location = "../Views/AddFind" + search;
-
+        window.location = "../Views/AddFind.html" + search;
+        }
     });
 
     $('#Edit').click(function () {
@@ -151,10 +132,10 @@ function InitialiseForm() {
             // remove to query to get the finds
             path = path.replace('/finds', "");
             if (path.indexOf("sites") != -1) {
-                path = "../Views/AddSite?id=" + path.replace("sites/", "");
+                path = "../Views/AddSite.html?id=" + path.replace("sites/", "");
             }
             if (path.indexOf("trenches") != -1) {
-                path = "../Views/AddTrench?id=" + path.replace("trenches/", "");
+                path = "../Views/AddTrench.html?id=" + path.replace("trenches/", "");
             }
             window.location.href = path;
         }
@@ -200,7 +181,6 @@ function loadDataGrid(path) {
             { name: 'notes',type:'string'}
         ],
         url: path
-       // localdata: findData
     };
     var findDataAdapter = new $.jqx.dataAdapter(findSource);
     findDataAdapter.dataBind();

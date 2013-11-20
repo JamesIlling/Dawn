@@ -6,30 +6,6 @@ function testService(location) {
 }
 
 $(document).ready(function () {
-    $("#Main").click(function () {
-        window.location = "../Views/Main.html";
-    });
-
-    $("#AddFind").click(function () {
-        window.location = "../Views/AddFind.html";
-    });
-    $("#AddTrench").click(function () {
-        window.location = "../Views/AddTrench.html";
-    });
-    $("#AddSite").click(function () {
-        window.location = "../Views/AddSite.html";
-    });
-
-    $("#Upload").click(function () {
-        window.location = "../Views/Upload.html";
-    });
-
-    $("#Settings").click(function () {
-        window.location = "../Views/settings.html";
-    });
-
-    var serviceLocation = getServiceLocation()
-
     updateUi(getServiceLocation() == defaultServiceLocation);
     $('#test').click(function () {
         var location = $('#location').val();
@@ -40,20 +16,20 @@ $(document).ready(function () {
         }
         else {
             alert("Unable to connect to service");
-
         }
-
     });
-    // $('#location').val(serviceLocation);
+
+
     $('#useServerService').click(function () {
         var location;
-        if ($('#useServerService').prop('checked') == true) {
+        var userServiceLocation = $('#useServerService');
+        if (userServiceLocation.prop('checked') == true) {
             location = defaultServiceLocation;
         }
         else {
             location = $('#location').val();
         }
-        updateUi($('#useServerService').prop('checked'));
+        updateUi(userServiceLocation.prop('checked'));
 
     });
 

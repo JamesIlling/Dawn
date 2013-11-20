@@ -14,8 +14,8 @@ function getRemote(remoteUrl) {
     }
 }
 
-$(document).ready(function () {
-    var theme = getDemoTheme();
+$(document).ready(function (){
+var theme = getDemoTheme();
     var data = getRemote(getServiceLocation() + "sites");
     var source = { datatype: "json", datafields: [
         { name: 'name' },
@@ -62,28 +62,3 @@ function populateForm(parameters) {
         $('#coordinates').val(parameters['coordinates']);
     }
 }
-
-$(document).ready(function () {
-
-    $("#Main").click(function () {
-        window.location = "../Views/Main.html";
-    });
-
-    $("#AddFind").click(function () {
-        window.location = "../Views/AddFind.html";
-    });
-    $("#AddTrench").click(function () {
-        window.location = "../Views/AddTrench.html";
-    });
-    $("#AddSite").click(function () {
-        window.location = "../Views/AddSite.html";
-    });
-
-    $("#Settings").click(function () {
-        window.location = "../Views/settings.html";
-    });
-
-    $("#Upload").click(function () {
-        window.location = "../Views/Upload.html";
-    });
-});

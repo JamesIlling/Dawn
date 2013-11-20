@@ -60,7 +60,7 @@ private function ClearDatabase()
         $this->assertEquals(1,$this->GetNextAutoIncrementId("trench"),"Unexpected next id");
     }
 
-    public function testNumberOffinds()
+    public function testNumberOfFinds()
     {
         $error = new ErrorResponse();
         $finds = $this->find->GetAll($error);

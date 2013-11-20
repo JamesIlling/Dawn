@@ -7,10 +7,10 @@
     <link rel="stylesheet" type="text/css" href="../Css/style.css"/>
     <link rel="stylesheet" type="text/css" href="../Css/jqWidget/jqx.base.css"/>
     <link rel="stylesheet" type="text/css" href="../Css/Main.css"/>
-
     <script type="text/javascript" src="../javascript/jquery-1.10.2.min.js"></script>
     <script type="text/javascript" src="../javascript/jqWidgets/getTheme.js"></script>
     <script type="text/javascript" src="../javascript/jqWidgets/jqx-all.js"></script>
+    <script type="text/javascript" src="../javascript/navigationBar.js"></script>
     <script src="../javascript/serviceLocation.js" type="text/javascript"></script>
     <script type="text/javascript" src="/javascript/main.js"></script>
     <script type="text/javascript">
@@ -20,30 +20,22 @@
     </script>
 </head>
 <body>
-<div class="container">
-    <button id="Main" class="navigationButton"><img src="../icons/Table.png"/><br/>Main screen</button>
-    <button id="AddFind" class="navigationButton"><img src="../icons/Milk-Bottle.png"/><br/>Add Find</button>
-    <button id="AddTrench" class="navigationButton"><img src="../icons/Spade-32.png"/><br/>Add Trench</button>
-    <button id="AddSite" class="navigationButton"><img src="../icons/Colosseum Of Rome-32.png"/><br/>Add site</button>
-    <button id="Settings" class="navigationButton"><img src="../icons/Settings-02.png"/><br/>Settings</button>
-    <button id="Upload" value='Upload' class="navigationButton"><img
-            src="/icons/Upload.png"/><br/>Upload
-    </button>
-</div>
+<div id="navigationBar" class="container"></div>
+
 <div class="content">
     <div style="height:100;">
-        <button id="Edit" class="navigationButton"><img src="../icons/Document-Edit.png"/><br/>Edit
+        <button id="Edit" class="navigationButton"><img src="../icons/editIcon.png"/><br/>Edit
         </button>
-        <button id="Delete" class="navigationButton"><img src="../icons/Document-Delete-02.png"/><br/>Delete
+        <button id="Delete" class="navigationButton"><img src="../icons/deleteIcon.png"/><br/>Delete
         </button>
         <button value="Export to Excel" id='excelExport' class="navigationButton"><img
-                src="/icons/Document-Download-02.png"/><br/>Download all
+                src="/icons/downloadIcon.png"/><br/>Download all
         </button>
         <button id="EditSelected" value='editSelected' class="navigationButton"><img
-                src="/icons/Document-Edit.png"/><br/>Edit Row
+                src="/icons/editIcon.png"/><br/>Edit Row
         </button>
         <button id="DeleteSelected" value='deleteSelected' class="navigationButton"><img
-                src="/icons/Document-Delete-02.png"/><br/>Delete Row
+                src="/icons/deleteIcon.png"/><br/>Delete Row
         </button>
     </div>
     <div id='jqxWidget'>

@@ -1,5 +1,5 @@
 ﻿input#geolocation {
-    background: #ccc url('../icons/GPS-Settings.png') repeat top left;
+    background: #ccc url('../icons/geolocationIcon.png') repeat top left;
     background-size: auto 28px;
     width: 32px;
 }

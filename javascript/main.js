@@ -72,7 +72,7 @@ function InitialiseForm() {
         { name: 'name', map: 'label', icon: 'icon', id: 'treeId', value: 'value' }
     ]);
     var treeView = $('#TreeView');
-    treeView.jqxTree({ source: records, theme: theme, height: "100%", width: "100%" });
+    treeView.jqxTree({ source: records,allowDrop:false,allowDrag:false, theme: theme, height: "100%", width: "100%" });
     treeView.on('select', function () {
         var path = getServiceLocation() + "" + treeView.jqxTree('getSelectedItem').value;
         loadDataGrid(path);
